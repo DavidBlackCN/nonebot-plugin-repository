@@ -11,4 +11,7 @@
 - [60s API](https://docs.60s-api.viki.moe/)
 - [胖大海API](https://api.suxun.site/)
 - [梦泽公共API](https://zeapi.ink/)
+- [SexPhoto API](https://sex.nyan.run/)
+- [夏柔 - 分享的API永不收费](https://api.aa1.cn/)
 
+https://apii.ctose.cn/api/cy/api?type=json
