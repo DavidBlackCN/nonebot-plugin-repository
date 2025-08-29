@@ -74,8 +74,13 @@ async def handle_img_command(bot: Bot, args: Message = CommandArg()):
             if 'application/json' in content_type:
                 try:
                     data = response.json()
-                    # 检查API返回的状态码和数据
-                    if data.get("code") == "200" and "url" in data:
+                    # 调试日志：记录API返回的数据（可选）
+                    # from nonebot.log import logger
+                    # logger.debug(f"API返回数据: {data}")
+                    
+                    # 检查API返回的状态码和数据，将code转换为字符串比较
+                    code = data.get("code")
+                    if str(code) == "200" and "url" in data:
                         img_url = data["url"]
                         # 发送图片
                         message = await img_cmd.send(MessageSegment.image(img_url))
