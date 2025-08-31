@@ -10,7 +10,7 @@ class Config(BaseModel):
     
     # 支持的图片分类 #可以再加一个r18选项
     valid_categories: List[str] = [
-        "all", "mp", "pc", "1080p", "silver", "furry", 
+        "mp", "pc", "1080p", "silver", "furry", 
         "starry", "setu", "ws", "pixiv"
     ]
     
