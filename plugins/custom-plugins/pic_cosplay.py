@@ -17,7 +17,7 @@ async def main():
 
 
 async def get_data():
-    url = 'https://api.sevin.cn/api/cos.php'
+    url = 'https://api.lolimi.cn/API/cosplay/api.php?type=image'
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.get(url)
         data = resp.text.strip()

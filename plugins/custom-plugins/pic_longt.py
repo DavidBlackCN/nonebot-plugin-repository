@@ -9,24 +9,21 @@ import base64
 
 # 插件元数据
 __plugin_meta__ = PluginMetadata(
-    name="MemePlugin",
-    description="获取并发送梗图",
-    usage="/meme - 随机获取一张梗图",
+    name="LongT",
+    description="获取并发送龙图",
+    usage="龙图 - 随机获取一张龙图",
     type="application",
     homepage="https://github.com/your_username/your_repo",
     supported_adapters={"~onebot.v11"},
 )
 
-# 注册 meme 命令
-meme_cmd = on_command("meme", priority=5, block=True)
+meme_cmd = on_command("龙图", priority=5, block=True)
 
-# 替换为你的API URL
-API_URL = "https://zeapi.ink/v1/api/sjmeme"
+API_URL = "https://api.lolimi.cn/API/longt/l.php"
 
 @meme_cmd.handle()
 async def handle_meme():
     try:
-        # 发送异步请求获取梗图
         async with aiohttp.ClientSession() as session:
             async with session.get(API_URL) as response:
                 if response.status == 200:
@@ -50,11 +47,11 @@ async def handle_meme():
                         # 发送图片
                         await meme_cmd.send(MessageSegment.image(text_response))
                 else:
-                    await meme_cmd.send("获取梗图失败，请稍后再试")
+                    await meme_cmd.send("获取龙图失败，请稍后再试")
 
     except FinishedException:
         # 这是正常的结束异常，不需要处理
         pass
     
     except Exception as e:
-        await meme_cmd.send(f"获取梗图时发生错误: {str(e)}")
+        await meme_cmd.send(f"获取龙图时发生错误: {str(e)}")

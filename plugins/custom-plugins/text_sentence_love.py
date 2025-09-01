@@ -1,22 +1,23 @@
 from nonebot import on_command
 import httpx
+import json
 
 
-sgyl = on_command(
-    '伤感语录',
+twqh = on_command(
+    '土味情话',
     block=True,
     priority=11
 )
 
 
-@sgyl.handle()
+@twqh.handle()
 async def main():
     msg = await get_data()
-    await sgyl.finish(msg)
+    await twqh.finish(msg)
 
 
 async def get_data():
-    url = 'https://api.yuafeng.cn/API/ly/shanggan.php?type=text'
+    url = 'https://api.suxun.site/api/qinghua'
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.get(url)
         data = resp.text

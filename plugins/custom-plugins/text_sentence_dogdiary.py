@@ -16,7 +16,7 @@ async def main():
 
 
 async def get_data():
-    url = 'https://api.sevin.cn/api/tgrj.php'
+    url = 'https://api.suyanw.cn/api/tiangou.php'
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.get(url)
         data = resp.text
