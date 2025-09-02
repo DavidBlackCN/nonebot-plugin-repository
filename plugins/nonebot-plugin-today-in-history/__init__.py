@@ -62,29 +62,109 @@ async def get_history_events():
     except Exception as e:
         return None, f"获取历史事件时发生错误: {e}"
 
-def format_history_message(history_data):
-    """格式化历史事件消息"""
+def create_forward_message(history_data, bot_info):
+    """创建转发消息"""
     date_str = history_data.get("date", "未知日期")
     items = history_data.get("items", [])
     
-    message = f"📜 历史上的今天 ({date_str})\n\n"
+    # 创建转发消息节点
+    nodes = []
     
-    # 限制显示的事件数量，避免消息过长
+    # 添加标题和所有事件的节点
+    events_text = f"📜 历史上的今天 ({date_str})\n\n"
+    
+    # 添加事件
     max_events = min(len(items), config.max_events)
-    
     for i, item in enumerate(items[:max_events]):
         event_type = "🎂" if item.get("event_type") == "birth" else "⚰️" if item.get("event_type") == "death" else "📅"
         title = item.get("title", "未知事件")
         year = item.get("year", "未知年份")
         
-        message += f"{event_type} {year}年: {title}\n"
+        events_text += f"{event_type} {year}年: {title}\n"
     
     if len(items) > max_events:
-        message += f"\n...还有 {len(items) - max_events} 个事件未显示"
+        events_text += f"\n...还有 {len(items) - max_events} 个事件未显示"
     
-    message += f"\n数据来源: {config.api_url}"
+    events_node = {
+        "type": "node",
+        "data": {
+            "name": bot_info["nickname"],
+            "user_id": str(bot_info["user_id"]),
+            "content": [
+                {
+                    "type": "text",
+                    "data": {"text": events_text}
+                }
+            ]
+        }
+    }
+    nodes.append(events_node)
     
-    return message
+    # 添加来源节点（单独的消息）
+    source_node = {
+        "type": "node",
+        "data": {
+            "name": bot_info["nickname"],
+            "user_id": str(bot_info["user_id"]),
+            "content": [
+                {
+                    "type": "text",
+                    "data": {"text": f"数据来源: {config.api_url}"}
+                }
+            ]
+        }
+    }
+    nodes.append(source_node)
+    
+    return nodes
+
+async def send_history_events(bot, group_id, history_data, bot_info):
+    """发送历史事件到指定群组"""
+    try:
+        # 先发送提示消息
+        await bot.send_group_msg(
+            group_id=group_id,
+            message="📜 叮！历史上的今天事件..."
+        )
+        
+        # 创建转发消息
+        forward_nodes = create_forward_message(history_data, bot_info)
+        
+        # 发送转发消息
+        await bot.call_api(
+            "send_group_forward_msg",
+            group_id=group_id,
+            messages=forward_nodes
+        )
+        return True
+    except Exception as e:
+        print(f"向群组 {group_id} 发送历史事件失败: {e}")
+        # 如果转发消息失败，尝试发送普通消息
+        try:
+            message = f"📜 历史上的今天 ({history_data.get('date', '未知日期')})\n\n"
+            items = history_data.get("items", [])
+            max_events = min(len(items), config.max_events)
+            
+            for i, item in enumerate(items[:max_events]):
+                event_type = "🎂" if item.get("event_type") == "birth" else "⚰️" if item.get("event_type") == "death" else "📅"
+                title = item.get("title", "未知事件")
+                year = item.get("year", "未知年份")
+                
+                message += f"{event_type} {year}年: {title}\n"
+            
+            if len(items) > max_events:
+                message += f"\n...还有 {len(items) - max_events} 个事件未显示"
+            
+            message += f"\n数据来源: {config.api_url}"
+            
+            await bot.send_group_msg(
+                group_id=group_id,
+                message=message
+            )
+            return True
+        except Exception as e2:
+            print(f"向群组 {group_id} 发送普通消息也失败: {e2}")
+            return False
 
 @history_today.handle()
 async def handle_history_today(event: Event, args: Message = CommandArg()):
@@ -95,14 +175,43 @@ async def handle_history_today(event: Event, args: Message = CommandArg()):
     if error:
         await history_today.finish(error)
     
-    # 格式化并发送消息
-    formatted_message = format_history_message(history_data)
-    await history_today.send(formatted_message)
+    # 获取bot实例和信息
+    try:
+        bot = get_bot()
+        bot_info = await bot.get_login_info()
+    except Exception as e:
+        await history_today.finish(f"获取bot信息失败: {e}")
+        return
     
-    # 记录群组ID（如果是群消息）
+    # 如果是群消息，使用转发消息格式
     if isinstance(event, GroupMessageEvent):
+        # 记录群组ID
         known_groups.add(event.group_id)
         print(f"记录群组ID: {event.group_id}")
+        
+        # 发送历史事件
+        success = await send_history_events(bot, event.group_id, history_data, bot_info)
+        if not success:
+            await history_today.finish("发送历史事件失败")
+    else:
+        # 对于私聊消息，使用普通消息格式
+        message = f"📜 历史上的今天 ({history_data.get('date', '未知日期')})\n\n"
+        items = history_data.get("items", [])
+        max_events = min(len(items), config.max_events)
+        
+        for i, item in enumerate(items[:max_events]):
+            event_type = "🎂" if item.get("event_type") == "birth" else "⚰️" if item.get("event_type") == "death" else "📅"
+            title = item.get("title", "未知事件")
+            year = item.get("year", "未知年份")
+            
+            message += f"{event_type} {year}年: {title}\n"
+        
+        if len(items) > max_events:
+            message += f"\n...还有 {len(items) - max_events} 个事件未显示"
+        
+        message += f"\n数据来源: {config.api_url}"
+        
+        await history_today.send(message)
 
 @scheduler.scheduled_job("cron", hour=config.scheduled_hour, minute=config.scheduled_minute, id="morning_history")
 async def scheduled_morning_history():
@@ -114,16 +223,13 @@ async def scheduled_morning_history():
         print(f"定时发送历史事件失败: {error}")
         return
     
-    # 获取bot实例
+    # 获取bot实例和信息
     try:
         bot = get_bot()
+        bot_info = await bot.get_login_info()
     except Exception as e:
         print(f"获取bot实例失败: {e}")
         return
-    
-    # 格式化消息
-    formatted_message = format_history_message(history_data)
-    greeting = f"早上好！今日历史事件回顾：\n\n{formatted_message}"
     
     # 如果没有已知群组，尝试获取所有群组
     if not known_groups:
@@ -140,11 +246,13 @@ async def scheduled_morning_history():
     success_count = 0
     for group_id in known_groups:
         try:
-            await bot.send_group_msg(
-                group_id=group_id,
-                message=greeting
-            )
-            success_count += 1
+            success = await send_history_events(bot, group_id, history_data, bot_info)
+            if success:
+                success_count += 1
+            else:
+                # 如果发送失败，可能是机器人不在该群，从列表中移除
+                known_groups.discard(group_id)
+            
             # 避免发送过快被限制
             await asyncio.sleep(config.send_delay)
         except Exception as e:

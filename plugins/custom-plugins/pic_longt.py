@@ -17,12 +17,12 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={"~onebot.v11"},
 )
 
-meme_cmd = on_command("龙图", priority=5, block=True)
+longt_cmd = on_command("龙图", priority=5, block=True)
 
 API_URL = "https://api.lolimi.cn/API/longt/l.php"
 
-@meme_cmd.handle()
-async def handle_meme():
+@longt_cmd.handle()
+async def handle_longt():
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(API_URL) as response:
@@ -39,19 +39,19 @@ async def handle_meme():
                         base64_data = base64.b64encode(image_data).decode('utf-8')
                         
                         # 发送 base64 编码的图片
-                        await meme_cmd.send(MessageSegment.image(f"base64://{base64_data}"))
+                        await longt_cmd.send(MessageSegment.image(f"base64://{base64_data}"))
                     else:
                         # 尝试获取文本响应（可能是URL）
                         text_response = await response.text()
                         
                         # 发送图片
-                        await meme_cmd.send(MessageSegment.image(text_response))
+                        await longt_cmd.send(MessageSegment.image(text_response))
                 else:
-                    await meme_cmd.send("获取龙图失败，请稍后再试")
+                    await longt_cmd.send("获取龙图失败，请稍后再试")
 
     except FinishedException:
         # 这是正常的结束异常，不需要处理
         pass
     
     except Exception as e:
-        await meme_cmd.send(f"获取龙图时发生错误: {str(e)}")
+        await longt_cmd.send(f"获取龙图时发生错误: {str(e)}")

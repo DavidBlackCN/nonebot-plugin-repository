@@ -11,7 +11,7 @@ class Config(BaseSettings):
     api_timeout: int = 10
     
     # 定时任务配置
-    scheduled_hour: int = 8
+    scheduled_hour: int = 10
     scheduled_minute: int = 0
     
     # 其他配置
