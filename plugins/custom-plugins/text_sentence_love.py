@@ -1,6 +1,5 @@
 from nonebot import on_command
 import httpx
-import json
 
 
 twqh = on_command(

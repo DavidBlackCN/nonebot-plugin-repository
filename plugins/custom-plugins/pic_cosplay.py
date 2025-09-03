@@ -47,11 +47,11 @@ async def handle_cosplay():
                         # 发送图片
                         await cosplay_cmd.send(MessageSegment.image(text_response))
                 else:
-                    await cosplay_cmd.send("获取梗图失败，请稍后再试")
+                    await cosplay_cmd.send("获取cosplay图片失败，请稍后再试")
 
     except FinishedException:
         # 这是正常的结束异常，不需要处理
         pass
     
     except Exception as e:
-        await cosplay_cmd.send(f"获取梗图时发生错误: {str(e)}")
+        await cosplay_cmd.send(f"获取cosplay图片时发生错误: {str(e)}")

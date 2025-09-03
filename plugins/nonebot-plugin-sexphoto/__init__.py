@@ -62,9 +62,26 @@ __plugin_meta__ = PluginMetadata(
 )
 
 # 创建命令
-sexphoto = on_command(plugin_config.sexphoto_command, priority=10, block=True)
-enable_r18 = on_command(plugin_config.sexphoto_enable_command, priority=10, block=True)
-disable_r18 = on_command(plugin_config.sexphoto_disable_command, priority=10, block=True)
+sexphoto = on_command(
+    plugin_config.sexphoto_command[0],  
+    aliases=set(plugin_config.sexphoto_command[1:]), 
+    priority=10,
+    block=True
+)
+
+enable_r18 = on_command(
+    plugin_config.sexphoto_enable_command[0],
+    aliases=set(plugin_config.sexphoto_enable_command[1:]),
+    priority=10,
+    block=True
+)
+
+disable_r18 = on_command(
+    plugin_config.sexphoto_disable_command[0],
+    aliases=set(plugin_config.sexphoto_disable_command[1:]),
+    priority=10,
+    block=True
+)
 
 async def fetch_sexphoto(num: int = 1, r18: bool = False, keyword: Optional[str] = None, tags: Optional[List[str]] = None) -> List[dict]:
     """从API获取色图数据，带重试机制"""
