@@ -1,7 +1,7 @@
 ## 简介
 自用的 [NoneBot](https://nonebot.dev/docs/) 插件仓库，储存了一些修改自其他dalao的插件和自己写的一些插件。
 
-注：包含有AI生成的代码，由于是仅自用所以并没有包含太多可配置项，部分插件的配置请直接在 `config.py` 内修改！
+注：包含有AI生成的代码，由于是仅自用所以并没有包含太多可配置项，部分插件的配置请参考插件内 `config.py` ！
 
 ## 鸣谢
 - [NoneBot](https://nonebot.dev/docs/)
@@ -20,10 +20,4 @@
 - [桑帛云API](https://api.lolimi.cn/)
 - [枫林API](https://api.yuafeng.cn/)
 
-土味情话
-伤感语录
-整点骚话
-网易云
-舔狗日记
-毒鸡汤
-
+http://edgecats.net/
