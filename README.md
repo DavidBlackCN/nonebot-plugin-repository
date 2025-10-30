@@ -11,13 +11,14 @@
 ## API
 - [60s API](https://docs.60s-api.viki.moe/)
 - [胖大海API](https://api.suxun.site/)
-- [梦泽公共API](https://zeapi.ink/)
+- [梦泽公共API](https://zeapi.ink/) R.I.P
 - [SexPhoto API](https://sex.nyan.run/)
 - [夏柔API](https://api.aa1.cn/)
 - [素颜API](https://api.suyanw.cn/#)
 - [小小API](https://xxapi.cn/)
-- [浪心API](https://api.lxtu.cn/)
 - [桑帛云API](https://api.lolimi.cn/)
 - [枫林API](https://api.yuafeng.cn/)
+- [咸虾米API](https://api.qingnian8.com/)
+- [UApiPro](https://uapis.cn/)
+- [神秘猫猫图](http://edgecats.net/)
 
-http://edgecats.net/

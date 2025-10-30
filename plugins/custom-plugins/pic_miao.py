@@ -14,12 +14,12 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={"onebot.v11"},
 )
 
-mn_cmd = on_command("猫猫", priority=10, block=True)
+miao_cmd = on_command("猫猫", priority=10, block=True)
 
 API_URL = "https://api.lxtu.cn/api.php?category=cat"
 
-@mn_cmd.handle()
-async def handle_mn():
+@miao_cmd.handle()
+async def handle_miao():
     try:
         # 获取图片URL
         async with httpx.AsyncClient() as client:
@@ -28,15 +28,15 @@ async def handle_mn():
             
             # 检查响应状态
             if response.status_code != 200:
-                await mn_cmd.finish(f"获取图片失败，状态码: {response.status_code}")
+                await miao_cmd.finish(f"获取图片失败，状态码: {response.status_code}")
             
             # 获取最终的重定向URL
             image_url = str(response.url)
             
             # 发送图片
-            await mn_cmd.send(MessageSegment.image(image_url))
+            await miao_cmd.send(MessageSegment.image(image_url))
             
     except httpx.RequestError as e:
-        await mn_cmd.finish(f"请求图片时发生错误: {e}")
+        await miao_cmd.finish(f"请求图片时发生错误: {e}")
     except Exception as e:
-        await mn_cmd.finish(f"发生未知错误: {e}")
+        await miao_cmd.finish(f"发生未知错误: {e}")

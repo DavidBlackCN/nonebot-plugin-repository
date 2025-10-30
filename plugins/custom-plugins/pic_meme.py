@@ -5,56 +5,51 @@ from nonebot.plugin import PluginMetadata
 from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.exception import FinishedException
 import aiohttp
-import base64
+import json
 
-# 插件元数据
 __plugin_meta__ = PluginMetadata(
-    name="MemePlugin",
+    name="梗图插件",
     description="获取并发送梗图",
-    usage="/meme - 随机获取一张梗图",
+    usage="使用命令 'meme' 来获取随机梗图",
     type="application",
-    homepage="https://github.com/your_username/your_repo",
-    supported_adapters={"~onebot.v11"},
+    homepage="https://github.com/your-username/your-repo",
+    supported_adapters=None,
 )
 
-# 注册 meme 命令
-meme_cmd = on_command("meme", priority=5, block=True)
+meme = on_command("meme", aliases={"梗图"}, priority=10, block=True)
 
 # 替换为你的API URL
-API_URL = "https://zeapi.ink/v1/api/sjmeme"
+API_URL = "https://tea.qingnian8.com/api/geng/random?pageSize=1"
 
-@meme_cmd.handle()
+@meme.handle()
 async def handle_meme():
     try:
-        # 发送异步请求获取梗图
+        # 获取API数据
         async with aiohttp.ClientSession() as session:
             async with session.get(API_URL) as response:
-                if response.status == 200:
-                    # 获取响应的内容类型
-                    content_type = response.headers.get('Content-Type', '')
-                    
-                    # 检查是否是图片
-                    if 'image' in content_type:
-                        # 直接读取二进制图片数据
-                        image_data = await response.read()
-                        
-                        # 将图片数据转换为 base64 编码
-                        base64_data = base64.b64encode(image_data).decode('utf-8')
-                        
-                        # 发送 base64 编码的图片
-                        await meme_cmd.send(MessageSegment.image(f"base64://{base64_data}"))
-                    else:
-                        # 尝试获取文本响应（可能是URL）
-                        text_response = await response.text()
-                        
-                        # 发送图片
-                        await meme_cmd.send(MessageSegment.image(text_response))
-                else:
-                    await meme_cmd.send("获取梗图失败，请稍后再试")
+                if response.status != 200:
+                    await meme.finish(f"API请求失败，状态码: {response.status}")
+                
+                data = await response.json()
+                
+                # 从返回的JSON中提取图片URL
+                # 根据实际API响应结构调整这里的路径
+                data_url = data.get("data")
+                image_url = data_url[0].get("url") if data_url else None
+
+                if not image_url:
+                    await meme.finish("API响应中没有找到图片链接")
+                
+                # 发送图片
+                await meme.finish(MessageSegment.image(image_url))
 
     except FinishedException:
-        # 这是正常的结束异常，不需要处理
+        # 忽略由finish方法引起的异常
         pass
-    
+
+    except aiohttp.ClientError as e:
+        await meme.finish(f"网络请求错误: {e}")
+    except json.JSONDecodeError as e:
+        await meme.finish(f"API响应解析错误: {e}")
     except Exception as e:
-        await meme_cmd.send(f"获取梗图时发生错误: {str(e)}")
+        await meme.finish(f"发生未知错误: {e}")
