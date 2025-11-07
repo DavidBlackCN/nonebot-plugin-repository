@@ -47,9 +47,9 @@ async def get_news_image():
         if data.get("code") != 200:
             return None, f"获取新闻失败: {data.get('message', '未知错误')}"
         
-        # 从data字段中获取图片URL
-        if data.get("data") and (image_url := data["data"].get("image")):
-            return image_url, None
+        # 从字段中获取图片URL
+        if data.get("image"):
+            return data["image"], None
         else:
             return None, "API返回数据中没有找到图片链接"
         

@@ -7,7 +7,11 @@ class Config(BaseSettings):
     sixty_seconds_aliases: List[str] = ["60s", "六十秒"]
     
     # API配置
-    api_url: str = "https://60s.zeabur.app/v2/60s"
+    api_url: str = "http://api.suxun.site/api/sixs?type=json"
+    # 可选备用API地址
+    # https://jx.iqfk.top/api/new
+    # https://60s.zeabur.app/v2/60s
+    # https://api.southerly.top/api/60s?format=image
     api_timeout: int = 10
     
     # 定时任务配置
